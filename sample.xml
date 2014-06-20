@@ -48,6 +48,7 @@
   <rooms>
     <room id="cellar1">
       <description>You find yourself in a cellar.</description>
+      <picture>pic1.dat</picture>
       <exits>
         <south>cellar2</south>
       </exits>
@@ -56,6 +57,7 @@
     </room>
     <room id="cellar2">
       <description>A smaller, darker, area of the cellar.</description>
+      <picture>pic2.dat</picture>
       <exits>
         <north>cellar1</north>
       </exits>
