@@ -8,6 +8,7 @@
 
 #define PROGRAM_TITLE       "Micro charm"
 #define VERSION_NUMBER      "0.1"
+#define PROGRAM_USAGE        "Usage: charm [options] <source file>"
 #define PROGRAM_DESCRIPTION "A compiler for building basic text adventures"
 
 using namespace std;
@@ -31,6 +32,7 @@ void displayUsage(po::options_description& d)
 {
     cout << PROGRAM_TITLE << " " << VERSION_NUMBER << endl;
     cout << PROGRAM_DESCRIPTION << endl;
+    cout << PROGRAM_USAGE << endl << endl;
     cout << endl << d << endl;
 }
 
