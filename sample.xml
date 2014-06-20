@@ -1,0 +1,65 @@
+<root>
+
+  <!-- General information -->
+  <adventure>
+    <name>Sample</name>
+    <version>1</version>
+    <startroom>cellar</startroom>
+    <startobjects/>
+  </adventure>
+
+  <!-- Messages -->
+  <messages>
+    <msg id="ok">OK</msg>
+    <msg id="cant">You can't</msg>
+    <msg id="donthave">You don't have that</msg>
+  </messages>
+
+  <!-- Verbs accepted by the game, a comma separated list means that all verbs are mapped to that ID -->
+  <verbs>
+    <verb id="push">push</verb>
+    <verb id="n">n,north</verb>
+    <verb id="s">s,south</verb>
+    <verb id="e">e,east</verb>
+    <verb id="w">w,west</verb>
+  </verbs>
+
+  <!-- Nouns -->
+  <nouns>
+  </nouns>
+
+  <!-- Adverbs -->
+  <adverbs>
+  </adverbs>
+
+  <!-- Objects -->
+  <objects>
+  </objects>
+
+  <!-- High priority conditions -->
+  <highconditions>
+  </highconditions>
+
+  <!-- Low priority conditions -->
+  <lowconditions>
+  </lowconditions>
+
+  <!-- Rooms -->
+  <rooms>
+    <room id="cellar1">
+      <description>You find yourself in a cellar.</description>
+      <exits>
+        <south>cellar2</south>
+      </exits>
+      <!-- Conditions are small blocks of code -->
+      <localconditions/>
+    </room>
+    <room id="cellar2">
+      <description>A smaller, darker, area of the cellar.</description>
+      <exits>
+        <north>cellar1</north>
+      </exits>
+    </room>
+  </rooms>
+</root>
+
