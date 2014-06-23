@@ -5,11 +5,12 @@
 #include <string>
 #include "boost/program_options.hpp"
 #include "Compiler.h"
+#include "BBCMicroWriter.h"
 
 #define PROGRAM_TITLE       "Micro charm"
 #define VERSION_NUMBER      "0.1"
-#define PROGRAM_USAGE        "Usage: charm [options] <source file>"
-#define PROGRAM_DESCRIPTION "A compiler for building basic text adventures"
+#define PROGRAM_USAGE        "Usage: charm [options] <input file> <output file>"
+#define PROGRAM_DESCRIPTION "A compiler for building simple text adventures"
 
 using namespace std;
 namespace po = boost::program_options;
@@ -23,9 +24,10 @@ enum BackEnd : uint8_t
 
 struct ProgramOptions
 {
-    string filename;
+    string  infile;
+    string  outfile;
     BackEnd backendType;
-    bool verbose;
+    bool    verbose;
 };
 
 void displayUsage(po::options_description& d)
@@ -46,6 +48,7 @@ bool parseCommandLine(int argc, _TCHAR* argv[], ProgramOptions& options)
     po::variables_map vm;
 
     string sourceFile;
+    string destFile;
     string backend;
 
     desc.add_options()
@@ -54,9 +57,11 @@ bool parseCommandLine(int argc, _TCHAR* argv[], ProgramOptions& options)
         ("backend,b",   po::value<string>(&backend),    "set backend writer");
 
     hidden.add_options()
-        ("input,i",     po::value<string>(&sourceFile), "set source file");
+        ("input,i",     po::value<string>(&sourceFile), "set source file")
+        ("output,o",    po::value<string>(&destFile),   "set destination file");
 
     pdesc.add("input",1);
+    pdesc.add("output",2);
 
     try
     {
@@ -71,7 +76,7 @@ bool parseCommandLine(int argc, _TCHAR* argv[], ProgramOptions& options)
         return false;
     }
 
-    if (vm.count("help") || vm.size()==0 || vm.count("input")==0)
+    if (vm.count("help") || vm.size()==0 || vm.count("input")==0 || vm.count("output")==0)
     {
         displayUsage(desc);
 
@@ -79,7 +84,8 @@ bool parseCommandLine(int argc, _TCHAR* argv[], ProgramOptions& options)
     }
     else
     {
-        options.filename    = sourceFile;
+        options.infile      = sourceFile;
+        options.outfile     = destFile;
         options.verbose     = vm.count("verbose") > 0;
         options.backendType = Undefined;
 
@@ -95,10 +101,10 @@ int _tmain(int argc, _TCHAR* argv[])
     {
         Compiler c;
 
-        if (c.compileFile(options.filename))
+        if (c.compileFile(options.infile))
         {
-            // Writer w;
-            // w.writeFile();
+            unique_ptr<Writer> w(new BBCMicroWriter());
+            w->writeFile(c, options.outfile);
         }
 
         return 1;

@@ -44,7 +44,7 @@ bool Compiler::compileFile( const std::string& sourceFile )
         //parseObjects();
         //parseHighConditions();
         //parseLowConditions();
-        //parseRooms(rootElement);
+        parseRooms(rootElement);
 
         return true;
     }

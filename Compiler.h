@@ -13,6 +13,10 @@ public:
 public:
     bool compileFile(const std::string& sourceFile);
 
+public:
+    size_t getNoRooms() const { return 0; }
+
+
 protected:
     void reset();
     void parseMessages(TiXmlElement*);
