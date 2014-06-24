@@ -1,6 +1,7 @@
 #include "stdafx.h"
 
 #include <fstream>
+#include <stdint.h>
 
 #include "BBCMicroWriter.h"
 #include "Compiler.h"
@@ -31,7 +32,7 @@ using namespace std;
  *
  */
 
-BBCMicroWriter::BBCMicroWriter(void)
+BBCMicroWriter::BBCMicroWriter(void) : m_baseAddress(0x2100) // Maybe pass this in on cmdline?
 {
 }
 
@@ -45,13 +46,49 @@ bool BBCMicroWriter::writeFile(const Compiler& c, const std::string& fileName)
     ofstream f(fileName,ios::binary);
 
     if (!f)
+    {
         return false;
+    }
 
-    // First, build the file
-    auto noRooms = c.getNoRooms();
+    // Version number
+    f << uint8_t(1);
+
+    // Start room
+    f << uint8_t(1);
+
+    // String table
+    auto stringTable = c.getStringTable();
+
+    for (auto i : stringTable)
+    {
+        f << i.second;
+        f << uint8_t(13);
+    }
+
+    // Rooms
+    auto rooms = c.getRooms();
+    uint8_t roomID = 0;
+
+    for (auto i : rooms)
+    {
+        f << roomID;
+        f << getOffsetForObjectID(i.second.description);
+        f << uint8_t(0); // n
+        f << uint8_t(0); // s
+        f << uint8_t(0); // e
+        f << uint8_t(0); // w
+        roomID++;
+    }
 
     // Then add to SSD?
     // DiskWriter.. blah blah
 
     return true;
+}
+
+uint16_t BBCMicroWriter::getOffsetForObjectID( const Compiler::idType& objID ) const
+{
+    // search for objID...
+
+    return m_baseAddress+0;
 }

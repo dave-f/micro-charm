@@ -24,10 +24,6 @@
     <verb id="w">w,west</verb>
   </verbs>
 
-  <!-- Nouns -->
-  <nouns>
-  </nouns>
-
   <!-- Adverbs -->
   <adverbs>
   </adverbs>
@@ -52,7 +48,7 @@
       <exits>
         <south>cellar2</south>
       </exits>
-      <!-- Conditions are small blocks of code -->
+      <!-- Small blocks of code to run at this location -->
       <localconditions/>
     </room>
     <room id="cellar2">
@@ -61,6 +57,8 @@
       <exits>
         <north>cellar1</north>
       </exits>
+      <!-- Small blocks of code to run at this location -->
+      <localconditions/>
     </room>
   </rooms>
 </root>

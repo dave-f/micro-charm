@@ -1,7 +1,10 @@
 #include "stdafx.h"
 #include "Compiler.h"
+#include <string>
 
-Compiler::Compiler(void)
+using namespace std;
+
+Compiler::Compiler(void) : m_generatedObjectID(0)
 {
 }
 
@@ -18,13 +21,32 @@ void Compiler::parseMessages( TiXmlElement* rootElement )
         for (auto i=messageElement->FirstChildElement("msg"); i!=nullptr; i=i->NextSiblingElement())
         {
             if (i->Attribute("id")!=nullptr)
-                m_messages.insert(std::make_pair(i->Attribute("id"),i->GetText()));
+            {
+                addToStringTable(i->Attribute("id"),i->GetText());
+            }
         }
     }
 }
 
-void Compiler::parseRooms( TiXmlElement* )
+void Compiler::parseRooms( TiXmlElement* rootElement )
 {
+    auto roomElement = rootElement->FirstChildElement("rooms");
+
+    if (roomElement)
+    {
+        for (auto i=roomElement->FirstChildElement("room"); i!=nullptr; i=i->NextSiblingElement())
+        {
+            Room newRoom;
+            auto d = i->FirstChildElement("description");
+            if (d!=nullptr)
+            {
+                string id = generateID();
+                addToStringTable(id, d->GetText());
+                newRoom.description = id;
+            }
+            m_rooms.insert(std::make_pair(i->Attribute("id"),newRoom)); // todo: check id !nullptr
+        }
+    }
 
 }
 
@@ -39,7 +61,6 @@ bool Compiler::compileFile( const std::string& sourceFile )
 
         parseMessages(rootElement);
         //parseVerbs();
-        //parseNouns();
         //parseAdverbs();
         //parseObjects();
         //parseHighConditions();
@@ -55,4 +76,9 @@ bool Compiler::compileFile( const std::string& sourceFile )
 void Compiler::reset()
 {
     m_messages.clear();
+}
+
+void Compiler::addToStringTable( const idType& id, const std::string& s )
+{
+    m_messages.insert(std::make_pair(id,s));
 }
