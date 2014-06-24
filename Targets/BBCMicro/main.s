@@ -1,15 +1,23 @@
-
 OS_WRCH = &FFEE
 OS_WORD = &FFF1
 OS_FILE = &FFDD
+OS_ASCI = &FFE3
 OS_BYTE = &FFF4
-ORG     = &1900
+
+INCLUDE "memory.s"
+INCLUDE "Player.s"
+INCLUDE "util.s"
+	
+ORG &1900
 	
 .start:	
 LDA #22
 JSR OS_WRCH
 LDA #7
 JSR OS_WRCH
+LDA #200
+LDX #3
+JSR OS_BYTE
 
 .loadFile:
 ; load data file in via OSFILE
@@ -42,6 +50,8 @@ RTS
 	EQUB 0,0,0,0
 
 .describeRoom:
+	LDA #0
+	JSR printText
 	RTS
 
 .getInput:
@@ -60,10 +70,47 @@ RTS
 	
 .inputBuffer:
 	SKIP 32
-	
+
+	; Print text with ID in X
+	; Y maybe contains flags?
+.printText:
+	{
+	; If A=X, print this, else move to offse
+	ASL A
+	TAX
+	LDA textTable+1,X
+	STA t1
+	LDA textTable,X
+	STA t0
+	LDY #0
+.loop:
+	LDA (t0),Y
+	JSR OS_ASCI ; preserves a,x,y
+	INY
+	CMP #13
+	BNE loop
+	RTS
+	}
+
 .parseInput:
 	CLC
 	RTS
+
+.gameData:
+	EQUB 1 ; version
+	EQUB 1 ; start room
+
+	; Text table follows
+.textTable:
+	EQUW strOne
+	EQUW strTwo
+	EQUB 0
+
+.strOne:
+	EQUS "You are in a cellar",13
+.strTwo:
+	EQUS "OK",13
+
 
 .end:
 
