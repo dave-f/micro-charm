@@ -24,7 +24,8 @@ JSR OS_BYTE
 LDA #$FF
 LDX #LO(fileBlock)
 LDY #HI(fileBlock)
-;JSR OS_FILE
+JSR OS_FILE
+JSR fixupPtrs
 
 .newRoom:
 JSR describeRoom
@@ -97,15 +98,27 @@ RTS
 	CLC
 	RTS
 
+.fixupPtrs:
+	{
+	LDX #0
+.loop:
+	ADDI16 textTable,gameData+3
+	INX
+	CPX numStrings
+	BNE loop
+	RTS
+	}
+
 .gameData:
 	EQUB 1 ; version
 	EQUB 1 ; start room
-    EQUB 1 ; num strings
+.numStrings:
+        EQUB 1 ; num strings
 
 .textTable:
-	; Text table follows : Needs to be patched on load!
-    SKIP 1024
-
+	FOR n,1,32
+	  EQUW 0
+	NEXT
 .end:
 
 SAVE "charm",start,end
