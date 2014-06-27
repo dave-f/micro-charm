@@ -14,6 +14,9 @@
     <msg id="prompt">What now?</msg>
     <msg id="cant">You can't</msg>
     <msg id="donthave">You don't have that</msg>
+    <system>
+      <msg id="test">Test system message 1</msg>
+    </system>
   </messages>
 
   <!-- Verbs accepted by the game, a comma separated list means that all verbs are mapped to that ID -->
