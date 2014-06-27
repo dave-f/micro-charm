@@ -11,6 +11,7 @@
   <!-- Messages -->
   <messages>
     <msg id="ok">OK</msg>
+    <msg id="prompt">What now?</msg>
     <msg id="cant">You can't</msg>
     <msg id="donthave">You don't have that</msg>
   </messages>
