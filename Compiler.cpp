@@ -61,7 +61,7 @@ bool Compiler::compileFile( const std::string& sourceFile )
 
         parseMessages(rootElement);
         //parseVerbs();
-        //parseAdverbs();
+        //parsePreps();
         //parseObjects();
         //parseHighConditions();
         //parseLowConditions();

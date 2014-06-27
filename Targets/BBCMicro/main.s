@@ -50,7 +50,8 @@ RTS
 	EQUB 0,0,0,0
 
 .describeRoom:
-	LDA #0
+        ; load player's room id
+	LDA #1
 	JSR printText
 	RTS
 
@@ -110,6 +111,13 @@ RTS
 	EQUS "You are in a cellar",13
 .strTwo:
 	EQUS "OK",13
+
+.roomData:
+    EQUB 0 ; room id
+    EQUB 0 ; offset to next room
+    EQUB 0 ; text ID
+    EQUB 0 ;
+    EQUB 0,0,0,0 ; n/s/e/w exits
 
 
 .end:

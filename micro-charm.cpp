@@ -9,7 +9,7 @@
 
 #define PROGRAM_TITLE       "Micro charm"
 #define VERSION_NUMBER      "0.1"
-#define PROGRAM_USAGE        "Usage: charm [options] <input file> <output file>"
+#define PROGRAM_USAGE       "Usage: charm [options] <input file> <output file>"
 #define PROGRAM_DESCRIPTION "A compiler for building simple text adventures"
 
 using namespace std;
@@ -103,7 +103,17 @@ int _tmain(int argc, _TCHAR* argv[])
 
         if (c.compileFile(options.infile))
         {
-            unique_ptr<Writer> w(new BBCMicroWriter());
+            unique_ptr<Writer> w;
+
+            switch(options.backendType)
+            {
+                case BBCMicro:
+                default:
+                    // Default to BBC for now
+                    w.reset(new BBCMicroWriter());
+                    break;
+            }
+            
             w->writeFile(c, options.outfile);
         }
 
