@@ -58,11 +58,17 @@ bool BBCMicroWriter::writeFile(const Compiler& c, const std::string& fileName)
 
     // String table
     auto stringTable = c.getStringTable();
+    
+    f << uint8_t(c.getStringTable().size());
+    short offset = 0;
 
     for (auto i : stringTable)
     {
+        f << offset; 
         f << i.second;
         f << uint8_t(13);
+
+        offset += i.second.length() + 1;
     }
 
     // Rooms

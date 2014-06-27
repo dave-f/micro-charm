@@ -24,14 +24,14 @@ JSR OS_BYTE
 LDA #$FF
 LDX #LO(fileBlock)
 LDY #HI(fileBlock)
-JSR OS_FILE
+;JSR OS_FILE
 
 .newRoom:
 JSR describeRoom
 
 .loop:
-LDA #'?'
-JSR OS_WRCH
+LDA #0
+JSR printText
 JSR getInput
 JSR parseInput
 BCS newRoom
@@ -44,14 +44,14 @@ RTS
 .fileBlock:
 	EQUB LO(fileName)
 	EQUB HI(fileName)
-	EQUB 0,$7d,0,0 ; load address? why 4 bytes?
+	EQUB LO(gameData),HI(gameData),0,0 ; load address? why 4 bytes?
 	EQUB 0,0,0,0
 	EQUB 0,0,0,0
 	EQUB 0,0,0,0
 
 .describeRoom:
         ; load player's room id
-	LDA #1
+	LDA #0
 	JSR printText
 	RTS
 
@@ -100,25 +100,11 @@ RTS
 .gameData:
 	EQUB 1 ; version
 	EQUB 1 ; start room
+    EQUB 1 ; num strings
 
-	; Text table follows
 .textTable:
-	EQUW strOne
-	EQUW strTwo
-	EQUB 0
-
-.strOne:
-	EQUS "You are in a cellar",13
-.strTwo:
-	EQUS "OK",13
-
-.roomData:
-    EQUB 0 ; room id
-    EQUB 0 ; offset to next room
-    EQUB 0 ; text ID
-    EQUB 0 ;
-    EQUB 0,0,0,0 ; n/s/e/w exits
-
+	; Text table follows : Needs to be patched on load!
+    SKIP 1024
 
 .end:
 
