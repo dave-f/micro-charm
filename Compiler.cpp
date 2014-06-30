@@ -38,7 +38,7 @@ void Compiler::parseMessages( TiXmlElement* rootElement )
                 if (i->Attribute("id")!=nullptr)
                 {
                     // Maybe need some special flag
-                    addToStringTable(i->Attribute("id"),i->GetText());
+                    addToStringTable(i->Attribute("id"),i->GetText(),80);
                 }
             }
         }
@@ -98,9 +98,20 @@ bool Compiler::compileFile( const std::string& sourceFile )
 void Compiler::reset()
 {
     m_messages.clear();
+    m_stringTableOffset = 0;
 }
 
-void Compiler::addToStringTable( const idType& id, const std::string& s )
+void Compiler::addToStringTable( const idType& id, const std::string& s, int32_t offset )
 {
-    m_messages.insert(std::make_pair(id,s));
+    if (offset==-1)
+    {
+        m_messages.push_back(boost::make_tuple(id,m_stringTableOffset,s));
+    }
+    else
+    {
+        m_messages.push_back(boost::make_tuple(id,offset + m_stringTableOffset,s));
+    }
+
+    m_stringTableOffset++;
 }
+

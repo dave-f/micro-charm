@@ -6,6 +6,7 @@
 #include <vector>
 #include <array>
 #include "tinyxml.h"
+#include "boost/tuple/tuple.hpp"
 
 class Compiler
 {
@@ -37,21 +38,25 @@ public:
     bool compileFile(const std::string& sourceFile);
 
     const std::map<idType,Room>& getRooms() const { return m_rooms; } 
-    const std::map<idType,std::string>& getStringTable() const { return m_messages; }
+    const std::vector<boost::tuple<idType,uint32_t,std::string>>& getStringTable() const 
+    { 
+        return m_messages; 
+    }
 
 
 protected:
     void reset();
     void parseMessages(TiXmlElement*);
     void parseRooms(TiXmlElement*);
-    void addToStringTable(const idType& id, const std::string& s);
+    void addToStringTable(const idType& id, const std::string& s, int32_t offset = -1);
     std::string generateID()
     {
         ++m_generatedObjectID;
         return "obj" + std::to_string(m_generatedObjectID);
     }
 
-    std::map<idType,std::string> m_messages;
+    std::vector<boost::tuple<idType,uint32_t,std::string>> m_messages;
     std::map<idType,Room> m_rooms;
     uint32_t m_generatedObjectID;
+    int32_t m_stringTableOffset;
 };

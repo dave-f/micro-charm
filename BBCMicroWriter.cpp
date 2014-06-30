@@ -2,6 +2,7 @@
 
 #include <fstream>
 #include <stdint.h>
+#include "boost/lexical_cast.hpp"
 
 #include "BBCMicroWriter.h"
 #include "Compiler.h"
@@ -59,17 +60,25 @@ bool BBCMicroWriter::writeFile(const Compiler& c, const std::string& fileName)
     f.write(reinterpret_cast<const char*>(&startRoom),1); 
 
     // String table
+    std::array<std::string,100> stringTable = buildStringTable(c);
+
+#if 0
     auto stringTable = c.getStringTable();
-    
-    f << uint8_t(c.getStringTable().size());
-    uint16_t offset = stringTable.size()*2;
+
+    // f << uint8_t(c.getStringTable().size());
+    std::array<uint16_t,100> ptrs;
+    uint16_t offset = ptrs.size()*2;
+
+    for (auto i : ptrs)
+    {
+        f.write(reinterpret_cast<const char*>(&offset),2);
+    }
 
     for (auto i : stringTable)
     {
         f.write(reinterpret_cast<const char*>(&offset),2); 
         offset += i.second.length() + 1;
     }
-
     m_ids.clear();
     uint32_t num = 0;
 
@@ -80,11 +89,13 @@ bool BBCMicroWriter::writeFile(const Compiler& c, const std::string& fileName)
         m_ids.push_back(std::make_pair(i.first,num));
         num++;
     }
+#endif
 
     // Rooms
     auto rooms = c.getRooms();
     uint8_t roomID = 0;
     int32_t objOffset;
+    uint32_t offset=0;
 
     //auto prompt = getOffsetForObjectID("obj1");
 
@@ -123,4 +134,21 @@ int32_t BBCMicroWriter::getOffsetForObjectID( const Compiler::idType& objID ) co
     });
 
     return obj==m_ids.end() ? -1 : obj->second;
+}
+
+std::array<std::string,100> BBCMicroWriter::buildStringTable(const Compiler& c)
+{
+    std::array<std::string,100> r;
+
+    auto x = c.getStringTable();
+
+    for (const auto& i : x)
+    {
+        auto thisOne = i.get<1>();//;
+        int thisOneAsInt = boost::lexical_cast<int>(thisOne);
+        r[thisOneAsInt] = i.get<2>();
+    }
+
+    // go
+    return std::move(r);
 }

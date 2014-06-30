@@ -28,6 +28,10 @@ LDX #LO(fileBlock)
 LDY #HI(fileBlock)
 JSR OS_FILE
 JSR fixupPtrs
+
+.initPlayer:
+LDA gameData+1
+STA player+0                     ; current room
         
 .newRoom:
 JSR describeRoom
@@ -106,14 +110,14 @@ RTS
 .loop:
     CLC
     LDA textTable,X
-    ADC #LO(gameData+3)
+    ADC #LO(gameData+2) ; hdr size=2 bytes at mo (version, start room)
     STA textTable,X
+    LDA textTable+1,X
+    ADC #HI(gameData+2)
+    STA textTable+1,X
     INX
-    LDA textTable,X
-    ADC #HI(gameData+3)
-    STA textTable,X
-	INX
-	CPX #14
+    INX
+    CPX #200
 	BNE loop
 	RTS
 	}
@@ -121,12 +125,10 @@ RTS
 .gameData:
 	EQUB 1 ; version
 	EQUB 1 ; start room
-.numStrings:
-    EQUB 1 ; num strings
 
 .textTable:
-	FOR n,1,32
-	  EQUW 0
+	FOR n,1,100
+	  EQUW 0 ; 16 bit addresses
 	NEXT
 .end:
 
