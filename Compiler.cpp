@@ -27,6 +27,21 @@ void Compiler::parseMessages( TiXmlElement* rootElement )
                 addToStringTable(i->Attribute("id"),i->GetText());
             }
         }
+
+        // System messages [30/6/2014 dave.footitt]
+        auto systemElement = messageElement->FirstChildElement("system");
+
+        if (systemElement)
+        {
+            for (auto i=systemElement->FirstChildElement("msg"); i!=nullptr; i=i->NextSiblingElement())
+            {
+                if (i->Attribute("id")!=nullptr)
+                {
+                    // Maybe need some special flag
+                    addToStringTable(i->Attribute("id"),i->GetText());
+                }
+            }
+        }
     }
 }
 

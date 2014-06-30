@@ -4,18 +4,19 @@
   <adventure>
     <name>Sample</name>
     <version>1</version>
-    <startroom>cellar</startroom>
+    <startroom>cellar1</startroom>
     <startobjects/>
   </adventure>
 
   <!-- Messages -->
   <messages>
-    <msg id="ok">OK</msg>
-    <msg id="prompt">What now?</msg>
-    <msg id="cant">You can't</msg>
-    <msg id="donthave">You don't have that</msg>
+    <msg id="pushdoor">You push the door</msg>
+    <!-- System messages, start from 240 -->
     <system>
-      <msg id="test">Test system message 1</msg>
+      <msg id="prompt">What now?</msg>
+      <msg id="ok">OK</msg>
+      <msg id="cant">You can't</msg>
+      <msg id="donthave">You don't have that</msg>
     </system>
   </messages>
 

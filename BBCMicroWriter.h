@@ -13,7 +13,9 @@ public:
     virtual bool writeFile(const Compiler& c, const std::string& fileName);
 
 protected:
-    uint16_t getOffsetForObjectID(const Compiler::idType& objID) const;
+    int32_t getOffsetForObjectID(const Compiler::idType& objID) const;
 
     uint16_t m_baseAddress;
+
+    std::vector<std::pair<Compiler::idType,uint32_t>> m_ids;
 };

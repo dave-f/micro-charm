@@ -48,7 +48,7 @@ protected:
     std::string generateID()
     {
         ++m_generatedObjectID;
-        return "Object" + std::to_string(m_generatedObjectID);
+        return "obj" + std::to_string(m_generatedObjectID);
     }
 
     std::map<idType,std::string> m_messages;

@@ -62,21 +62,31 @@ bool BBCMicroWriter::writeFile(const Compiler& c, const std::string& fileName)
     auto stringTable = c.getStringTable();
     
     f << uint8_t(c.getStringTable().size());
-    uint16_t offset = 0;
+    uint16_t offset = stringTable.size()*2;
 
     for (auto i : stringTable)
     {
         f.write(reinterpret_cast<const char*>(&offset),2); 
+        offset += i.second.length() + 1;
+    }
+
+    m_ids.clear();
+    uint32_t num = 0;
+
+    for (auto i : stringTable)
+    {
         f << i.second;
         f.put(13); // cr, not sure we need this
-
-        offset += i.second.length() + 1;
+        m_ids.push_back(std::make_pair(i.first,num));
+        num++;
     }
 
     // Rooms
     auto rooms = c.getRooms();
     uint8_t roomID = 0;
-    uint16_t objOffset;
+    int32_t objOffset;
+
+    //auto prompt = getOffsetForObjectID("obj1");
 
     for (auto i : rooms)
     {
@@ -94,7 +104,6 @@ bool BBCMicroWriter::writeFile(const Compiler& c, const std::string& fileName)
             {
                 // no exit, write 0
             }
-
         }
 
         roomID++;
@@ -106,9 +115,12 @@ bool BBCMicroWriter::writeFile(const Compiler& c, const std::string& fileName)
     return true;
 }
 
-uint16_t BBCMicroWriter::getOffsetForObjectID( const Compiler::idType& objID ) const
+int32_t BBCMicroWriter::getOffsetForObjectID( const Compiler::idType& objID ) const
 {
-    // search for objID...
+    auto obj = std::find_if(m_ids.cbegin(),m_ids.cend(),[&](const std::pair<Compiler::idType,uint32_t>& i)
+    {
+        return i.first==objID;
+    });
 
-    return m_baseAddress+0;
+    return obj==m_ids.end() ? -1 : obj->second;
 }

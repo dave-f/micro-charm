@@ -7,6 +7,8 @@ OS_BYTE = &FFF4
 INCLUDE "memory.s"
 INCLUDE "Player.s"
 INCLUDE "util.s"
+
+MSG_PROMPT = 5
 	
 ORG &1900
 	
@@ -26,12 +28,12 @@ LDX #LO(fileBlock)
 LDY #HI(fileBlock)
 JSR OS_FILE
 JSR fixupPtrs
-
+        
 .newRoom:
 JSR describeRoom
 
 .loop:
-LDA #0
+LDA #MSG_PROMPT
 JSR printText
 JSR getInput
 JSR parseInput
@@ -51,8 +53,8 @@ RTS
 	EQUB 0,0,0,0
 
 .describeRoom:
-        ; load player's room id
-	LDA #0
+    ; load player's room id
+	LDA #2
 	JSR printText
 	RTS
 
@@ -102,9 +104,16 @@ RTS
 	{
 	LDX #0
 .loop:
-	ADDI16 textTable,gameData+3
+    CLC
+    LDA textTable,X
+    ADC #LO(gameData+3)
+    STA textTable,X
+    INX
+    LDA textTable,X
+    ADC #HI(gameData+3)
+    STA textTable,X
 	INX
-	CPX numStrings
+	CPX #14
 	BNE loop
 	RTS
 	}
@@ -113,7 +122,7 @@ RTS
 	EQUB 1 ; version
 	EQUB 1 ; start room
 .numStrings:
-        EQUB 1 ; num strings
+    EQUB 1 ; num strings
 
 .textTable:
 	FOR n,1,32
