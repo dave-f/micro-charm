@@ -20,15 +20,7 @@ void Compiler::parseMessages( TiXmlElement* rootElement )
 
     if (messageElement)
     {
-        for (auto i=messageElement->FirstChildElement("msg"); i!=nullptr; i=i->NextSiblingElement())
-        {
-            if (i->Attribute("id")!=nullptr)
-            {
-                addToStringTable(i->Attribute("id"),i->GetText());
-            }
-        }
-
-        // System messages [30/6/2014 dave.footitt]
+        // System messages come first [30/6/2014 dave.footitt]
         auto systemElement = messageElement->FirstChildElement("system");
 
         if (systemElement)
@@ -38,10 +30,21 @@ void Compiler::parseMessages( TiXmlElement* rootElement )
                 if (i->Attribute("id")!=nullptr)
                 {
                     // Maybe need some special flag
-                    addToStringTable(i->Attribute("id"),i->GetText(),80);
+                    addToStringTable(i->Attribute("id"),i->GetText(),80); // TODO: Remove this offset, not needed now
+                    // Can possibly remove boost::tuple now too.
                 }
             }
         }
+        
+        // Now the other messages
+        for (auto i=messageElement->FirstChildElement("msg"); i!=nullptr; i=i->NextSiblingElement())
+        {
+            if (i->Attribute("id")!=nullptr)
+            {
+                addToStringTable(i->Attribute("id"),i->GetText());
+            }
+        }
+
     }
 }
 
