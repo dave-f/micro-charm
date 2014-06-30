@@ -4,19 +4,29 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <array>
 #include "tinyxml.h"
 
 class Compiler
 {
 public:
     typedef std::string idType;
+    static const  std::string nullObjectId;
 
 private:
     struct Room
     {
+        enum ExitType : uint8_t
+        {
+            None = 0,
+            North = 1,
+            South = 2,
+            East = 3,
+            West = 4
+        };
         // blah blah
         idType description;
-        std::vector<std::pair<std::string,idType>> exits; // nsew->roomID
+        std::array<idType,4> exits;
     };
 
 public:

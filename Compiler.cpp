@@ -4,6 +4,8 @@
 
 using namespace std;
 
+const string Compiler::nullObjectId = "null";
+
 Compiler::Compiler(void) : m_generatedObjectID(0)
 {
 }
@@ -43,6 +45,11 @@ void Compiler::parseRooms( TiXmlElement* rootElement )
                 string id = generateID();
                 addToStringTable(id, d->GetText());
                 newRoom.description = id;
+            }
+            // For now
+            for (auto& j : newRoom.exits)
+            {
+                j = nullObjectId;
             }
             m_rooms.insert(std::make_pair(i->Attribute("id"),newRoom)); // todo: check id !nullptr
         }

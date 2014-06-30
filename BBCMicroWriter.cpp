@@ -51,22 +51,24 @@ bool BBCMicroWriter::writeFile(const Compiler& c, const std::string& fileName)
     }
 
     // Version number
-    f << uint8_t(1);
+    uint8_t versionNumber = 1;
+    f.write(reinterpret_cast<const char*>(&versionNumber),1); 
 
     // Start room
-    f << uint8_t(1);
+    uint8_t startRoom = 1;
+    f.write(reinterpret_cast<const char*>(&startRoom),1); 
 
     // String table
     auto stringTable = c.getStringTable();
     
     f << uint8_t(c.getStringTable().size());
-    short offset = 0;
+    uint16_t offset = 0;
 
     for (auto i : stringTable)
     {
-        f << offset; 
+        f.write(reinterpret_cast<const char*>(&offset),2); 
         f << i.second;
-        f << uint8_t(13);
+        f.put(13); // cr, not sure we need this
 
         offset += i.second.length() + 1;
     }
@@ -74,19 +76,31 @@ bool BBCMicroWriter::writeFile(const Compiler& c, const std::string& fileName)
     // Rooms
     auto rooms = c.getRooms();
     uint8_t roomID = 0;
+    uint16_t objOffset;
 
     for (auto i : rooms)
     {
-        f << roomID;
-        f << getOffsetForObjectID(i.second.description);
-        f << uint8_t(0); // n
-        f << uint8_t(0); // s
-        f << uint8_t(0); // e
-        f << uint8_t(0); // w
+        f.write(reinterpret_cast<const char*>(&roomID),1);
+        objOffset = getOffsetForObjectID(i.second.description);
+        f.write(reinterpret_cast<const char*>(&offset),2);
+        
+        for (auto j : i.second.exits) // needs to be populated with n,s,e,w
+        {
+            if (true)
+            {
+                f.put(0);
+            }
+            else
+            {
+                // no exit, write 0
+            }
+
+        }
+
         roomID++;
     }
 
-    // Then add to SSD?
+    // Then add to SSD if specified maybe
     // DiskWriter.. blah blah
 
     return true;
