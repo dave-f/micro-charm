@@ -60,36 +60,27 @@ bool BBCMicroWriter::writeFile(const Compiler& c, const std::string& fileName)
     f.write(reinterpret_cast<const char*>(&startRoom),1); 
 
     // String table
-    std::array<std::string,100> stringTable = buildStringTable(c);
-
-#if 0
-    auto stringTable = c.getStringTable();
-
-    // f << uint8_t(c.getStringTable().size());
-    std::array<uint16_t,100> ptrs;
-    uint16_t offset = ptrs.size()*2;
-
-    for (auto i : ptrs)
-    {
-        f.write(reinterpret_cast<const char*>(&offset),2);
-    }
+    std::vector<std::string> stringTable = buildStringTable(c);
+    uint8_t numElems = stringTable.size(); // todo: check > 255
+    f.write(reinterpret_cast<const char*>(&numElems),1);
+    uint16_t stringOffset = numElems*2;
 
     for (auto i : stringTable)
     {
-        f.write(reinterpret_cast<const char*>(&offset),2); 
-        offset += i.second.length() + 1;
+        f.write(reinterpret_cast<const char*>(&stringOffset),2);
+        stringOffset += i.length() + 1;
     }
+
     m_ids.clear();
     uint32_t num = 0;
 
     for (auto i : stringTable)
     {
-        f << i.second;
+        f << i;
         f.put(13); // cr, not sure we need this
-        m_ids.push_back(std::make_pair(i.first,num));
+        //m_ids.push_back(std::make_pair(i.first,num));
         num++;
     }
-#endif
 
     // Rooms
     auto rooms = c.getRooms();
@@ -136,19 +127,17 @@ int32_t BBCMicroWriter::getOffsetForObjectID( const Compiler::idType& objID ) co
     return obj==m_ids.end() ? -1 : obj->second;
 }
 
-std::array<std::string,100> BBCMicroWriter::buildStringTable(const Compiler& c)
+std::vector<std::string> BBCMicroWriter::buildStringTable(const Compiler& c)
 {
-    std::array<std::string,100> r;
-
+    std::vector<std::string> r;
     auto x = c.getStringTable();
+
+    uint32_t j = 0;
 
     for (const auto& i : x)
     {
-        auto thisOne = i.get<1>();//;
-        int thisOneAsInt = boost::lexical_cast<int>(thisOne);
-        r[thisOneAsInt] = i.get<2>();
+        r.push_back(i.second);
     }
 
-    // go
-    return std::move(r);
+    return r; // move
 }

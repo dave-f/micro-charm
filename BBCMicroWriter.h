@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #include "writer.h"
 #include "Compiler.h"
 
@@ -14,7 +16,7 @@ public:
 
 protected:
     int32_t getOffsetForObjectID(const Compiler::idType& objID) const;
-    std::array<std::string,100> buildStringTable(const Compiler& c);
+    std::vector<std::string> buildStringTable(const Compiler& c);
 
     uint16_t m_baseAddress;
 

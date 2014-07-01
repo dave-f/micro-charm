@@ -6,7 +6,7 @@ using namespace std;
 
 const string Compiler::nullObjectId = "null";
 
-Compiler::Compiler(void) : m_generatedObjectID(0)
+Compiler::Compiler(void)
 {
 }
 
@@ -30,7 +30,7 @@ void Compiler::parseMessages( TiXmlElement* rootElement )
                 if (i->Attribute("id")!=nullptr)
                 {
                     // Maybe need some special flag
-                    addToStringTable(i->Attribute("id"),i->GetText(),80); // TODO: Remove this offset, not needed now
+                    addToStringTable(i->Attribute("id"),i->GetText()); // TODO: Remove this offset, not needed now
                     // Can possibly remove boost::tuple now too.
                 }
             }
@@ -101,20 +101,11 @@ bool Compiler::compileFile( const std::string& sourceFile )
 void Compiler::reset()
 {
     m_messages.clear();
-    m_stringTableOffset = 0;
+    m_generatedObjectID = 0;
 }
 
-void Compiler::addToStringTable( const idType& id, const std::string& s, int32_t offset )
+void Compiler::addToStringTable( const idType& id, const std::string& s )
 {
-    if (offset==-1)
-    {
-        m_messages.push_back(boost::make_tuple(id,m_stringTableOffset,s));
-    }
-    else
-    {
-        m_messages.push_back(boost::make_tuple(id,offset + m_stringTableOffset,s));
-    }
-
-    m_stringTableOffset++;
+    m_messages.push_back(std::make_pair(id,s));
 }
 

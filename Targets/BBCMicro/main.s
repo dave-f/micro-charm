@@ -8,7 +8,7 @@ INCLUDE "memory.s"
 INCLUDE "Player.s"
 INCLUDE "util.s"
 
-MSG_PROMPT = 5
+MSG_PROMPT = 0
 	
 ORG &1900
 	
@@ -28,7 +28,8 @@ LDX #LO(fileBlock)
 LDY #HI(fileBlock)
 JSR OS_FILE
 JSR fixupPtrs
-
+;RTS
+        
 .initPlayer:
 LDA gameData+1
 STA player+0                     ; current room
@@ -57,8 +58,8 @@ RTS
 	EQUB 0,0,0,0
 
 .describeRoom:
-    ; load player's room id
-	LDA #2
+    ; load player's room id TODO
+	LDA #6
 	JSR printText
 	RTS
 
@@ -110,14 +111,14 @@ RTS
 .loop:
     CLC
     LDA textTable,X
-    ADC #LO(gameData+2) ; hdr size=2 bytes at mo (version, start room)
+    ADC #LO(gameData+3) ; hdr size=2 bytes at mo (version, start room)
     STA textTable,X
     LDA textTable+1,X
-    ADC #HI(gameData+2)
+    ADC #HI(gameData+3)
     STA textTable+1,X
     INX
     INX
-    CPX #200
+    CPX #8*2 ; numstrings TODO
 	BNE loop
 	RTS
 	}
@@ -125,6 +126,7 @@ RTS
 .gameData:
 	EQUB 1 ; version
 	EQUB 1 ; start room
+    EQUB 1 ; num strings
 
 .textTable:
 	FOR n,1,100
