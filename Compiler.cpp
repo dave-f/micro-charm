@@ -14,6 +14,17 @@ Compiler::~Compiler(void)
 {
 }
 
+void Compiler::parseHeader(TiXmlElement* rootElement)
+{
+    auto headerElement= rootElement->FirstChildElement("adventure");
+
+    if (headerElement)
+    {
+        auto startElem = headerElement->FirstChildElement("start");
+        m_startRoomStr = startElem==nullptr ? "" : startElem->GetText();
+    }
+}
+
 void Compiler::parseMessages( TiXmlElement* rootElement )
 {
     auto messageElement = rootElement->FirstChildElement("messages");
@@ -88,6 +99,7 @@ bool Compiler::compileFile( const std::string& sourceFile )
         TiXmlElement* rootElement = doc.RootElement();
         reset();
 
+        parseHeader(rootElement);
         parseMessages(rootElement);
         //parseVerbs();
         //parsePreps();

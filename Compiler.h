@@ -41,10 +41,14 @@ public:
     { 
         return m_messages; 
     }
-
+    std::string getStartRoom() const
+    {
+        return m_startRoomStr;
+    }
 
 protected:
     void reset();
+    void parseHeader(TiXmlElement*);
     void parseMessages(TiXmlElement*);
     void parseRooms(TiXmlElement*);
     void addToStringTable(const idType& id, const std::string& s);
@@ -56,6 +60,6 @@ protected:
 
     std::vector<std::pair<idType,std::string>> m_messages;
     std::vector<std::pair<idType,Room>> m_rooms;
-
+    std::string m_startRoomStr;
     uint32_t m_generatedObjectID;
 };

@@ -51,12 +51,31 @@ bool BBCMicroWriter::writeFile(const Compiler& c, const std::string& fileName)
         return false;
     }
 
+    // ------------ Header
+
     // Write Version number
     uint8_t versionNumber = 1;
     f.write(reinterpret_cast<const char*>(&versionNumber),1); 
 
     // Write Start room
-    uint8_t startRoom = 2;
+    uint8_t startRoom;
+    std::string s = c.getStartRoom();
+    if (s.empty())
+    {
+        startRoom = 1;
+    }
+    else
+    {
+        startRoom = 0;
+        for (auto& i : c.getRooms())
+        {
+            if (i.first==s)
+            {
+                break;
+            }
+            startRoom++;
+        }
+    }
     f.write(reinterpret_cast<const char*>(&startRoom),1); 
 
     // Build string table
@@ -73,6 +92,8 @@ bool BBCMicroWriter::writeFile(const Compiler& c, const std::string& fileName)
         totalStringLength += (i.length()+1); // string length + CR
     uint16_t roomOffset = 5 + numElems*2 + totalStringLength; // 5 is the header size (ver,start room,rooms offset(2 bytes) and num strings)
     f.write(reinterpret_cast<const char*>(&roomOffset),2);
+
+    // ------------ Header
 
     // Write string table
     for (auto i : stringTable)
