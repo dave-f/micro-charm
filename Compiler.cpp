@@ -54,6 +54,10 @@ void Compiler::parseRooms( TiXmlElement* rootElement )
 
     if (roomElement)
     {
+        // Add "room 0" : this is where all the objects dropped go[2/7/2014 dave.footitt]
+        Room r;
+        m_rooms.push_back(std::make_pair(nullObjectId,r));
+
         for (auto i=roomElement->FirstChildElement("room"); i!=nullptr; i=i->NextSiblingElement())
         {
             Room newRoom;
@@ -69,7 +73,7 @@ void Compiler::parseRooms( TiXmlElement* rootElement )
             {
                 j = nullObjectId;
             }
-            m_rooms.insert(std::make_pair(i->Attribute("id"),newRoom)); // todo: check id !nullptr
+            m_rooms.push_back(std::make_pair(i->Attribute("id"),newRoom)); // todo: check id !nullptr
         }
     }
 
@@ -101,6 +105,7 @@ bool Compiler::compileFile( const std::string& sourceFile )
 void Compiler::reset()
 {
     m_messages.clear();
+    m_rooms.clear();
     m_generatedObjectID = 0;
 }
 

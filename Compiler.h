@@ -36,7 +36,7 @@ public:
 public:
     bool compileFile(const std::string& sourceFile);
 
-    const std::map<idType,Room>& getRooms() const { return m_rooms; } 
+    const std::vector<std::pair<idType,Room>>& getRooms() const { return m_rooms; } 
     const std::vector<std::pair<idType,std::string>>& getStringTable() const 
     { 
         return m_messages; 
@@ -55,6 +55,7 @@ protected:
     }
 
     std::vector<std::pair<idType,std::string>> m_messages;
-    std::map<idType,Room> m_rooms;
+    std::vector<std::pair<idType,Room>> m_rooms;
+
     uint32_t m_generatedObjectID;
 };
