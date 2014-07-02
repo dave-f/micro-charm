@@ -28,7 +28,6 @@ LDX #LO(fileBlock)
 LDY #HI(fileBlock)
 JSR OS_FILE
 JSR fixupPtrs
-;RTS
         
 .initPlayer:
 LDA gameData+1
@@ -58,10 +57,39 @@ RTS
 	EQUB 0,0,0,0
 
 .describeRoom:
-    ; load player's room id TODO
-	LDA #6
+    LDA player+0 ; get room id
+    JSR findRoom
+    LDY #2
+    LDA (t0),Y   ; get room description
 	JSR printText
 	RTS
+
+    ; A=room
+    ; return with roomLO,roomHI in t0,t1
+.findRoom:
+    {
+    STA t2 ; room wanted
+    LDA gameData+3
+    STA t0
+    LDA gameData+4
+    STA t1
+    LDY #0
+ .loop:
+    LDA (t0),Y
+    CMP t2
+    BEQ out
+    ; Otherwise add on the room offset and keep looking
+    CLC
+    LDA t0
+    ADC #8 ; just 8 for now
+    STA t0
+    LDA t1
+    ADC #0
+    STA t1
+    JMP loop
+.out:        
+    RTS
+    }
 
 .getInput:
 	LDA #0
@@ -107,18 +135,22 @@ RTS
 
 .fixupPtrs:
 	{
-	LDX #0
+	LDX gameData+2 ; num strings + room offset
+    INX
+    STX t0
+    LDX #3
+        
 .loop:
     CLC
-    LDA textTable,X
-    ADC #LO(gameData+3) ; hdr size=2 bytes at mo (version, start room)
-    STA textTable,X
-    LDA textTable+1,X
-    ADC #HI(gameData+3)
-    STA textTable+1,X
+    LDA gameData,X
+    ADC #LO(gameData) ; hdr size=2 bytes at mo (version, start room)
+    STA gameData,X
+    LDA gameData+1,X
+    ADC #HI(gameData)
+    STA gameData+1,X
     INX
-    INX
-    CPX #8*2 ; numstrings TODO
+    INX ; needs to be done better
+    DEC t0
 	BNE loop
 	RTS
 	}
@@ -127,11 +159,13 @@ RTS
 	EQUB 1 ; version
 	EQUB 1 ; start room
     EQUB 1 ; num strings
-
+    EQUW 0 ; offset to rooms
+        
 .textTable:
 	FOR n,1,100
 	  EQUW 0 ; 16 bit addresses
 	NEXT
+        
 .end:
 
 SAVE "charm",start,end

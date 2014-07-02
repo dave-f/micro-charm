@@ -51,52 +51,65 @@ bool BBCMicroWriter::writeFile(const Compiler& c, const std::string& fileName)
         return false;
     }
 
-    // Version number
+    // Write Version number
     uint8_t versionNumber = 1;
     f.write(reinterpret_cast<const char*>(&versionNumber),1); 
 
-    // Start room
-    uint8_t startRoom = 1;
+    // Write Start room
+    uint8_t startRoom = 2;
     f.write(reinterpret_cast<const char*>(&startRoom),1); 
 
-    // String table
+    // Build string table
     std::vector<std::string> stringTable = buildStringTable(c);
     uint8_t numElems = stringTable.size(); // todo: check > 255
-    f.write(reinterpret_cast<const char*>(&numElems),1);
-    uint16_t stringOffset = numElems*2;
 
+    // Write num strings
+    f.write(reinterpret_cast<const char*>(&numElems),1);
+    uint16_t stringOffset = 5 + numElems*2; // 5 is the header size (ver,start room,rooms offset(2 bytes) and num strings)
+
+    // Write room offset
+    uint16_t totalStringLength = 0;
+    for (auto& i : stringTable)
+        totalStringLength += (i.length()+1); // string length + CR
+    uint16_t roomOffset = 5 + numElems*2 + totalStringLength; // 5 is the header size (ver,start room,rooms offset(2 bytes) and num strings)
+    f.write(reinterpret_cast<const char*>(&roomOffset),2);
+
+    // Write string table
     for (auto i : stringTable)
     {
         f.write(reinterpret_cast<const char*>(&stringOffset),2);
         stringOffset += i.length() + 1;
     }
 
-    m_ids.clear();
-    uint32_t num = 0;
-
+    // now write the strings
     for (auto i : stringTable)
     {
         f << i;
-        f.put(13); // cr, not sure we need this
-        //m_ids.push_back(std::make_pair(i.first,num));
-        num++;
+        f.put(13);
     }
 
     // Rooms
     auto rooms = c.getRooms();
     uint8_t roomID = 0;
-    int32_t objOffset;
-    uint32_t offset=0;
+    uint8_t nextRoomOffset = 0;
+    uint8_t spare = 0;
 
-    //auto prompt = getOffsetForObjectID("obj1");
-
-    for (auto i : rooms)
+    for (auto& i : rooms)
     {
+        // Room ID (1 byte)
         f.write(reinterpret_cast<const char*>(&roomID),1);
-        objOffset = getOffsetForObjectID(i.second.description);
-        f.write(reinterpret_cast<const char*>(&offset),2);
+
+        // Offset to next room (1 byte)
+        nextRoomOffset = 8;
+        f.write(reinterpret_cast<const char*>(&nextRoomOffset),1);
         
-        for (auto j : i.second.exits) // needs to be populated with n,s,e,w
+        // Room description ID (1 byte)
+        uint8_t descriptionIndex;
+        getStringID(i.second.description,descriptionIndex);
+        f.write(reinterpret_cast<const char*>(&descriptionIndex),1);
+        
+        // Room exits (4 bytes)
+        for (auto j : i.second.exits)
         {
             if (true)
             {
@@ -108,6 +121,9 @@ bool BBCMicroWriter::writeFile(const Compiler& c, const std::string& fileName)
             }
         }
 
+        // Spare (1 byte)
+        f.write(reinterpret_cast<const char*>(&spare),1);
+
         roomID++;
     }
 
@@ -117,26 +133,32 @@ bool BBCMicroWriter::writeFile(const Compiler& c, const std::string& fileName)
     return true;
 }
 
-int32_t BBCMicroWriter::getOffsetForObjectID( const Compiler::idType& objID ) const
+bool BBCMicroWriter::getStringID( const Compiler::idType& objID, uint8_t& id ) const
 {
-    auto obj = std::find_if(m_ids.cbegin(),m_ids.cend(),[&](const std::pair<Compiler::idType,uint32_t>& i)
-    {
-        return i.first==objID;
-    });
+    auto it = m_stringIDs.find(objID);
 
-    return obj==m_ids.end() ? -1 : obj->second;
+    if (it !=m_stringIDs.end())
+    {
+        id = static_cast<uint8_t>(it->second);
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
 
 std::vector<std::string> BBCMicroWriter::buildStringTable(const Compiler& c)
 {
     std::vector<std::string> r;
     auto x = c.getStringTable();
-
     uint32_t j = 0;
+    m_stringIDs.clear();
 
     for (const auto& i : x)
     {
         r.push_back(i.second);
+        m_stringIDs[i.first]=j++;
     }
 
     return r; // move

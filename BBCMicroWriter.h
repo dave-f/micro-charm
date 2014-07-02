@@ -15,11 +15,9 @@ public:
     virtual bool writeFile(const Compiler& c, const std::string& fileName);
 
 protected:
-    int32_t getOffsetForObjectID(const Compiler::idType& objID) const;
+    bool getStringID(const Compiler::idType& objID, uint8_t& id) const;
     std::vector<std::string> buildStringTable(const Compiler& c);
 
     uint16_t m_baseAddress;
-
-    std::vector<std::pair<Compiler::idType,uint32_t>> m_ids;
-    std::array<std::string,100> m_stringTable;
+    std::map<Compiler::idType,uint32_t> m_stringIDs;
 };
