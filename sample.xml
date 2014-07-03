@@ -16,7 +16,10 @@
       <msg id="ok">OK</msg>
       <msg id="cant">You can't</msg>
       <msg id="donthave">You don't have that</msg>
-      <msg id="eh">I don't understand</msg>
+      <msg id="eh">Pardon?</msg>
+      <msg id="carrying">You are carrying</msg>
+      <msg id="cantsee">You can't see that</msg>
+      <msg id="dark">It is dark. You can't see</msg>
     </system>
     <msg id="pushdoor">You push the door</msg>
   </messages>
