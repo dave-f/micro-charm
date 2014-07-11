@@ -130,8 +130,61 @@ RTS
 	}
 
 .parseInput:
-	CLC
+    {
+    LDA inputBuffer
+    CMP #'N'
+    BEQ north
+    CMP #'S'
+    BEQ south
+    CMP #'E'
+    BEQ east
+    CMP #'W'
+    BEQ west
+    ; Do nothing
+.noChange:        
+    CLC
 	RTS
+    ; Can we go north?
+.north:
+    LDA player+0
+    JSR findRoom
+    LDY #3 ; N
+    LDA (t0),Y ; exit?
+    BEQ noChange
+    STA player+0
+    SEC
+    RTS
+    ; Can we go south?
+.south:
+    LDA player+0
+    JSR findRoom
+    LDY #4 ; S
+    LDA (t0),Y ; exit?
+    BEQ noChange
+    STA player+0
+    SEC
+    RTS
+    ; Can we go east?
+.east:
+    LDA player+0
+    JSR findRoom
+    LDY #5 ; E
+    LDA (t0),Y ; exit?
+    BEQ noChange
+    STA player+0
+    SEC
+    RTS
+    ; Can we go west?
+.west:
+    LDA player+0
+    JSR findRoom
+    LDY #6 ; W
+    LDA (t0),Y ; exit?
+    BEQ noChange
+    STA player+0
+    SEC
+    RTS
+    }
 
 .fixupPtrs:
 	{

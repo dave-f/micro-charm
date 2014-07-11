@@ -4,7 +4,7 @@
   <adventure>
     <name>Sample</name>
     <version>1</version>
-    <start>cellar2</start>
+    <start>cellar1</start>
     <startobjects/>
   </adventure>
 
