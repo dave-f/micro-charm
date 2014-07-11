@@ -132,13 +132,15 @@ bool BBCMicroWriter::writeFile(const Compiler& c, const std::string& fileName)
         // Room exits (4 bytes)
         for (auto j : i.second.exits)
         {
-            if (true)
+            if ( j == Compiler::nullObjectId )
             {
                 f.put(0);
             }
             else
             {
-                // no exit, write 0
+                uint8_t roomID=0;
+                getRoomID(j,rooms,roomID);
+                f.write(reinterpret_cast<const char*>(&roomID),1);
             }
         }
 
@@ -167,6 +169,20 @@ bool BBCMicroWriter::getStringID( const Compiler::idType& objID, uint8_t& id ) c
     {
         return false;
     }
+}
+
+bool BBCMicroWriter::getRoomID( const Compiler::idType& objID, const std::vector<std::pair<Compiler::idType,Compiler::Room>>& r, uint8_t& id) const
+{
+    for (uint8_t i=0; i< r.size(); ++i)
+    {
+        if (r[i].first==objID)
+        {
+            id=i;
+            return true;
+        }
+    }
+
+    return false;
 }
 
 std::vector<std::string> BBCMicroWriter::buildStringTable(const Compiler& c)

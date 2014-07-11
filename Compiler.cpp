@@ -1,6 +1,7 @@
 #include "stdafx.h"
-#include "Compiler.h"
 #include <string>
+#include "Compiler.h"
+#include "boost/algorithm/string.hpp"
 
 using namespace std;
 
@@ -67,6 +68,8 @@ void Compiler::parseRooms( TiXmlElement* rootElement )
     {
         // Add "room 0" : this is where all the objects dropped go[2/7/2014 dave.footitt]
         Room r;
+        r.description = nullObjectId;
+        std::fill(r.exits.begin(),r.exits.end(),Compiler::nullObjectId);
         m_rooms.push_back(std::make_pair(nullObjectId,r));
 
         for (auto i=roomElement->FirstChildElement("room"); i!=nullptr; i=i->NextSiblingElement())
@@ -79,12 +82,31 @@ void Compiler::parseRooms( TiXmlElement* rootElement )
                 addToStringTable(id, d->GetText());
                 newRoom.description = id;
             }
-            // For now
-            for (auto& j : newRoom.exits)
+
+            for (auto& e : newRoom.exits)
+                e = nullObjectId;
+
+            TiXmlElement* e = i->FirstChildElement("exits");
+            if (e != nullptr)
             {
-                j = nullObjectId;
+                std::array<std::string,4> d = {"north","south","east","west"};
+
+                for (e=e->FirstChildElement(); e != nullptr; e=e->NextSiblingElement())
+                {
+                    uint32_t exitNo = 0;
+                    for (auto& exitStr : d)
+                    {
+                        if (boost::iequals(e->Value(),exitStr))
+                        {
+                            newRoom.exits[exitNo]=e->GetText();
+                            break;
+                        }
+                        ++exitNo;
+                    }
+                }
             }
-            m_rooms.push_back(std::make_pair(i->Attribute("id"),newRoom)); // todo: check id !nullptr
+
+            m_rooms.push_back(std::make_pair(i->Attribute("id"),newRoom));
         }
     }
 

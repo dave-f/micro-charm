@@ -13,7 +13,6 @@ public:
     typedef std::string idType;
     static const  std::string nullObjectId;
 
-private:
     struct Room
     {
         enum ExitType : uint8_t
